@@ -1,4 +1,7 @@
 #!/bin/bash
+# Add this to .bash_profile:
+## SSH_COMPLETE=`cat ~/.dns_completion`
+## complete -o default -W "${SSH_COMPLETE[*]}" ping ssh telnet host mtr
 
 dns_file=~/.dns_completion
 
