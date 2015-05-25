@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+die "Usage: ./log_grep file_name src_ip [dst_ip]\n" if ( @ARGV < 2 );
+
+my $logfile = shift @ARGV;
+my $src_ip = shift @ARGV;
+my $dst_ip = shift @ARGV;
+
+open my $log_fh,'<',$logfile
+	or die "Could not open $logfile";
+
+my %list;
+my @top;
+my $total = 0;
+
+if ( ! $dst_ip ) {
+	while ( <$log_fh> ) {
+		if (/SRC=$src_ip\sDST=([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/) {
+			$list{$1}++;
+		}
+	}
+} else {
+	while ( <$log_fh> ) {
+		if (/DST=($dst_ip)[\d\D]+?PROTO=(\w+)[\d\D]+?DPT=(\d+)/) {
+			$list{"($2) $1:$3"}++;
+		}
+	}
+}
+
+@top = sort { $list{$b} <=> $list{$a} } keys %list;
+
+for my $key (@top) {
+#	if ( $list{$key} >= 100 ) {
+		print "$key\t\t=> $list{$key}\n";
+#	}
+	$total += $list{$key};
+}
+print "TOTAL\t\t\t => $total\n";
